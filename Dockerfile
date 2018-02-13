@@ -53,5 +53,24 @@ RUN pip3 install \
     tensorflow-gpu \
     && rm -r /root/.cache/pip
 
+# Install necessary libraries for Mask R-CNN
+RUN pip3 install \
+    scikit-image \
+    Cython \
+    && rm -r /root/.cache/pip
+
+# Install necessary libraries to build pycocotools
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd $WORKDIR \
+    && git clone https://github.com/waleedka/coco \
+    && cd coco/PythonAPI \
+    && sed -i 's/python/python3/g' Makefile \
+    && make \
+    && make install \
+    && python3 setup.py install
+
 # Start jupyter notebook
 CMD jupyter-notebook --ip="*" --no-browser --allow-root
